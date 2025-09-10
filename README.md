@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project1 - Next.js Social Media App
 
-## Getting Started
+A modern social media application built with Next.js 15, featuring user authentication, posts, and comments functionality.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Authentication**: Login with Google OAuth or email/password
+- **Posts Management**: Create, read, update, and delete posts with image uploads
+- **Comments System**: Add comments to posts
+- **Responsive Design**: Built with Tailwind CSS and Radix UI
+- **Dark/Light Theme**: Theme switching support
+- **Real-time UI**: Interactive components with animations
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js
+- **Styling**: Tailwind CSS v4, Radix UI components
+- **Forms**: React Hook Form with Zod validation
+- **Animations**: Motion library, Magic UI components
+- **File Upload**: Image upload functionality
+
+## Installation
+
+### Prerequisites
+
+- Node.js 18+ 
+- PostgreSQL database
+- Google OAuth credentials (optional)
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd project1
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory:
+   ```env
+   # Database
+   DATABASE_URL="postgresql://username:password@localhost:5432/project1_db"
+   
+   # NextAuth
+   NEXTAUTH_SECRET="your-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   
+   # Google OAuth (Optional)
+   GOOGLE_CLIENT_ID="your-google-client-id"
+   GOOGLE_CLIENT_SECRET="your-google-client-secret"
+   
+   # App URL
+   NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+   ```
+
+4. **Database Setup**
+   ```bash
+   # Generate Prisma client
+   npx prisma generate
+   
+   # Run migrations
+   npx prisma migrate dev
+   
+   # Optional: Open Prisma Studio
+   npx prisma studio
+   ```
+
+5. **Run the application**
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+├── app/
+│   ├── (auth)/          # Authentication pages
+│   ├── (main)/          # Main application pages
+│   └── api/             # API routes
+├── components/          # Reusable components
+├── lib/                 # Utility functions
+├── prisma/              # Database schema and migrations
+└── types/               # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Available Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Key Features
 
-## Learn More
+### Authentication
+- Google OAuth integration
+- Email/password registration and login
+- Protected routes and middleware
 
-To learn more about Next.js, take a look at the following resources:
+### Posts
+- Create posts with title, content, and images
+- Edit and delete own posts
+- Image upload functionality
+- Responsive post cards
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Comments
+- Add comments to posts
+- Real-time comment display
+- User attribution
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is for educational purposes.

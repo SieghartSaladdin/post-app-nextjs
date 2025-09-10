@@ -1,0 +1,185 @@
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { set, z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { useState } from 'react';
+import DialogAlert from '@/components/reusable/dialogAlert';
+import Swal from 'sweetalert2';
+import ImageUploader from "@/components/reusable/inputImageUploader";
+
+export default function PostEdit({ 
+  post, postId
+}: { 
+  post: any, postId: string
+}) {
+
+  const router = useRouter();
+  const [loading, setLoading] = useState(false); // Ganti dengan logika sesi yang sesuai
+  const [submitLoading, setSubmitLoading] = useState(false); // Ganti dengan logika sesi yang sesuai
+
+
+  const formSchema = z.object({
+    title: z.string().min(1, 'Title is required'),
+    image: z
+      .instanceof(File, {
+      message: "File gambar diperlukan.",
+      })
+      .refine((file) => file.size < 5000000, "Ukuran file harus kurang dari 5MB.")
+      .refine(
+      (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
+      "Hanya file JPG, PNG, atau GIF yang diizinkan."
+      ),
+    content: z.string().min(1, 'Content is required'),
+  });
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: post.title,
+      image: post.image,
+      content: post.content,
+    },
+  });
+
+  const submitFunc = async (data: z.infer<typeof formSchema>) => {
+    try {
+      setSubmitLoading(true);
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update post');
+      }
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        icon: 'success',
+        title: 'Success',
+        text: 'Post updated successfully',
+      })
+
+    } catch (error) {
+      console.error('Error updating post:', error);
+    } finally {
+      setSubmitLoading(false);
+    }
+  }
+
+  const deleteFunc = async (postId: string) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete post');
+      }
+
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        icon: 'success',
+        title: 'Success',
+        text: 'Post Deleted successfully',
+      })
+
+      router.push('/posts');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Form {...form} >
+      <form onSubmit={form.handleSubmit(submitFunc)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Title" {...field}/>
+              </FormControl>
+              <FormDescription>This is the title of the post.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+          <FormItem>
+              <FormLabel>Image</FormLabel>
+              <FormControl>
+              <ImageUploader
+                initialImageUrl={field.value} // biar ada preview kalau value sudah ada (misal dari DB)
+                onImageUpload={(file) => {
+                  if (file) {
+                    form.setValue("image", file, { shouldValidate: true });
+                  }
+                }}
+              />
+              </FormControl>
+              <FormMessage />
+          </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="content"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Content</FormLabel>
+              <FormControl>
+                <Input placeholder="Content" {...field}/>
+              </FormControl>
+              <FormDescription>This is the content of the post.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+          <div className='flex gap-4 items-center'>
+            <Button type="submit">Update Post</Button>
+            <DialogAlert
+              loading={loading}
+              name='Delete Post'
+              variant='destructive'
+              submitFunction={() => deleteFunc(post.id)}
+              title='Yakin ingin menghapus post ini?'
+              description={`Data yang sudah dihapus tidak dapat dikembalikan. Post Id : ${post.id}`}
+            />
+          </div>
+      </form>
+    </Form>
+  )
+}
