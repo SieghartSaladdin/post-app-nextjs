@@ -4,11 +4,11 @@ import { revalidatePath } from 'next/cache'
 
 // GET detail post by ID
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;  // ambil id dari Promise
   const post = await prisma.post.findUnique({
-    where: { id: Number(params.id) },
+    where: { id: Number(id) },
     include: {
       comments: {
         include: {
@@ -37,7 +37,6 @@ export async function PUT(
 
 // DELETE post
 export async function DELETE(
-  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   await prisma.post.delete({
