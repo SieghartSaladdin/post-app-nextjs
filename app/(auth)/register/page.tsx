@@ -91,8 +91,12 @@ export default function RegisterPage() {
         router.refresh();
       }
 
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Terjadi kesalahan yang tidak diketahui.');
+      }
     } finally {
       setLoading(false);
     }
@@ -102,7 +106,7 @@ export default function RegisterPage() {
     setLoadingGoogle(true);
     try {
       await signIn('google', { callbackUrl: '/' });
-    } catch (error) {
+    } catch (error: unknown) {
       setError('Terjadi kesalahan saat mendaftar dengan Google');
     } finally {
       setLoadingGoogle(false);

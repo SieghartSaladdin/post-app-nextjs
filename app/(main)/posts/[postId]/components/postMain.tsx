@@ -4,8 +4,9 @@ import { useState, useEffect } from "react"
 import PostEdit from "./postEdit"
 import PostDetail from "./postDetail";
 import { useSession } from "next-auth/react";
+import { Post } from '@/types/post';
 
-export default function PostMain({post, postId}: {post :any, postId: any}) {
+export default function PostMain({post, postId}: {post: Post, postId: number}) {
     const [isSameSession, setSessionSame] = useState(false);
     const { data: session } = useSession();
     
@@ -19,7 +20,7 @@ export default function PostMain({post, postId}: {post :any, postId: any}) {
     return (
         <div>
             {isSameSession ? (
-                <PostEdit post={post} postId={postId} />
+                <PostEdit post={post} postId={postId.toString()} />
             ) : (
                 <PostDetail post={post} />
             )}

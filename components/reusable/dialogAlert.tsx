@@ -28,7 +28,7 @@ export default function DialogAlert({
     name: string
     variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
     loading: boolean
-    submitFunction?: (value: any) => void
+    submitFunction?: (value: () => void) => void
 }) {
     return (
         <div>
@@ -44,7 +44,7 @@ export default function DialogAlert({
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant={variant} disabled={loading} onClick={() => submitFunction && submitFunction({})}>
+                        <Button variant={variant} disabled={loading} onClick={() => submitFunction && submitFunction(() => {})}>
                             {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
                             Confirm
                         </Button>

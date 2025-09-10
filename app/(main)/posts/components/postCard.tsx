@@ -12,7 +12,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import Comments from '../[postId]/components/comments';
-export default function PostCard({ post }: { post: any }) {
+import { Post } from '@/types/post';
+
+export default function PostCard({ post }: { post: Post }) {
   const router = useRouter();
 
   return (
@@ -28,7 +30,7 @@ export default function PostCard({ post }: { post: any }) {
           className="relative w-[300px] h-[250px] cursor-pointer"
         >
           <Image
-            src={post.image}
+            src={post.image || '/placeholder.jpg'}
             alt={post.title}
             fill
             className="object-cover rounded-t-xl"

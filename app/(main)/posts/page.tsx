@@ -7,15 +7,18 @@ import { Button } from '@/components/ui/button';
 import { Meteors } from "@/components/magicui/meteors";
 import { Globe } from '@/components/magicui/globe';
 
+// Types
+import { Post } from '@/types/post';
+
 export default async function Page() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const cardData = await fetch(`${baseUrl}/api/posts`,
     { cache: "force-cache" }
   );
-  const posts = await cardData.json();
+  const posts: Post[] = await cardData.json();
 
-  function chunkArray(arr: any[], size: number) {
-    const result = [];
+  function chunkArray<T>(arr: T[], size: number): T[][] {
+    const result: T[][] = [];
     for (let i = 0; i < arr.length; i += size) {
       result.push(arr.slice(i, i + size));
     }
@@ -40,7 +43,7 @@ export default async function Page() {
             <Meteors number={100} />
             Info : {i * group.length + 1}-{(i + 1) * group.length} Post
             <div className="flex gap-12">
-               {group.map((post: any) => (
+               {group.map((post: Post) => (
                 <PostCard key={post.id} post={post} />
               ))}
             </div>

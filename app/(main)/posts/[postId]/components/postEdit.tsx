@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { set, z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { Post } from '@/types/post';
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,7 +25,7 @@ import ImageUploader from "@/components/reusable/inputImageUploader";
 export default function PostEdit({ 
   post, postId
 }: { 
-  post: any, postId: string
+  post: Post, postId: string
 }) {
 
   const router = useRouter();
@@ -42,7 +43,8 @@ export default function PostEdit({
       .refine(
       (file) => ["image/jpeg", "image/png", "image/gif"].includes(file.type),
       "Hanya file JPG, PNG, atau GIF yang diizinkan."
-      ),
+      )
+      .optional(),
     content: z.string().min(1, 'Content is required'),
   });
 
@@ -50,8 +52,8 @@ export default function PostEdit({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: post.title,
-      image: post.image,
-      content: post.content,
+      image: undefined,
+      content: post.content || '',
     },
   });
 
@@ -141,7 +143,7 @@ export default function PostEdit({
               <FormLabel>Image</FormLabel>
               <FormControl>
               <ImageUploader
-                initialImageUrl={field.value} // biar ada preview kalau value sudah ada (misal dari DB)
+                initialImageUrl={post.image} // biar ada preview kalau value sudah ada (misal dari DB)
                 onImageUpload={(file) => {
                   if (file) {
                     form.setValue("image", file, { shouldValidate: true });
@@ -174,7 +176,7 @@ export default function PostEdit({
               loading={loading}
               name='Delete Post'
               variant='destructive'
-              submitFunction={() => deleteFunc(post.id)}
+              submitFunction={() => deleteFunc(post.id.toString())}
               title='Yakin ingin menghapus post ini?'
               description={`Data yang sudah dihapus tidak dapat dikembalikan. Post Id : ${post.id}`}
             />

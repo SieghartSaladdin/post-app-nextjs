@@ -2,8 +2,9 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AddComment from "./addComment";
+import { Comment } from '@/types/post';
 
-export default function Comments({ postComment, postId }: { postComment: any[], postId: number }) {
+export default function Comments({ postComment, postId }: { postComment: Comment[], postId: number }) {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl mb-2">Comments:</h1>
