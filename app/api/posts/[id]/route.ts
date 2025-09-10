@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma' // pastikan prisma client sudah di-setup
+import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 // GET detail post by ID
 export async function GET(
+  req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;  // ambil id dari Promise
+  const { id } = await context.params
   const post = await prisma.post.findUnique({
     where: { id: Number(id) },
-    include: {
-      comments: {
-        include: {
-          author: true, // <-- ini untuk ambil data user dari authorId
-        },
-      }
-    }
+    include: { comments: { include: { author: true } } },
   })
   return NextResponse.json(post)
 }
@@ -23,26 +18,26 @@ export async function GET(
 // PUT (Edit post)
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   const data = await req.json()
+  const { id } = await context.params
   const updated = await prisma.post.update({
-    where: { id: Number(params.id) },
+    where: { id: Number(id) },
     data,
   })
 
-  revalidatePath('/posts');
+  revalidatePath('/posts')
   return NextResponse.json(updated)
 }
 
 // DELETE post
 export async function DELETE(
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> } // ✅ signature benar
 ) {
-  await prisma.post.delete({
-    where: { id: Number(params.id) },
-  })
-  
-  revalidatePath('/posts');
+  const { id } = await context.params
+  await prisma.post.delete({ where: { id: Number(id) } })
+  revalidatePath('/posts')
   return NextResponse.json({ message: 'Post deleted' })
 }
