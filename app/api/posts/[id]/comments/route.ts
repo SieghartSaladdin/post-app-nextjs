@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: number } }
+  { params }: { params: { id: string } }
 ) {
   
   const formData = await req.formData();
