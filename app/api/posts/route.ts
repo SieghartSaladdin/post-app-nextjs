@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { writeFile } from 'fs/promises';
 import path from 'path';
 import { revalidatePath } from 'next/cache';
+import type { NextRequest } from 'next/server';
 
 // GET /api/posts
 export async function GET() {
@@ -21,9 +22,10 @@ export async function GET() {
   return NextResponse.json(posts)
 }
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest,) {
   try {
-    const formData = await request.formData();
+    
+    const formData = await req.formData();
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const authorId = formData.get('authorId') as string;

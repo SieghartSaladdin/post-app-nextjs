@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma' // pastikan prisma client sudah di-setup
 import { revalidatePath } from 'next/cache'
 
 // GET detail post by ID
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const post = await prisma.post.findUnique({
@@ -22,7 +22,7 @@ export async function GET(
 
 // PUT (Edit post)
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const data = await req.json()
@@ -37,7 +37,7 @@ export async function PUT(
 
 // DELETE post
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   await prisma.post.delete({
