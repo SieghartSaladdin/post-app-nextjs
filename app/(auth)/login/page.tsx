@@ -62,7 +62,7 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (error) {
-      setError('Terjadi kesalahan saat login');
+      setError(error instanceof Error ? error.message : 'Terjadi kesalahan saat login');
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,7 @@ export default function LoginPage() {
     try {
       await signIn('google', { callbackUrl: '/' });
     } catch (error) {
-      setError('Terjadi kesalahan saat login dengan Google');
+      setError(error instanceof Error ? error.message : 'Terjadi kesalahan saat login dengan Google');
     } finally {
       setLoadingGoogle(false);
     }

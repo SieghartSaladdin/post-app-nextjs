@@ -67,7 +67,7 @@ export default function DialogAdd({children}: {children: React.ReactNode}) {
         },
     })
 
-    async function onSubmit(data: any) {
+    async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
             setLoading(true);
 

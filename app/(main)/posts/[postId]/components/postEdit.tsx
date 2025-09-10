@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { set, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { Post } from '@/types/post';
@@ -21,6 +21,7 @@ import { useState } from 'react';
 import DialogAlert from '@/components/reusable/dialogAlert';
 import Swal from 'sweetalert2';
 import ImageUploader from "@/components/reusable/inputImageUploader";
+import { Loader } from 'lucide-react';
 
 export default function PostEdit({ 
   post, postId
@@ -138,7 +139,7 @@ export default function PostEdit({
         <FormField
           control={form.control}
           name="image"
-          render={({ field }) => (
+          render={() => (
           <FormItem>
               <FormLabel>Image</FormLabel>
               <FormControl>
@@ -171,7 +172,10 @@ export default function PostEdit({
           )}
         />
           <div className='flex gap-4 items-center'>
-            <Button type="submit">Update Post</Button>
+            <Button disabled={submitLoading} type="submit">
+              {submitLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+              Update Post
+            </Button>
             <DialogAlert
               loading={loading}
               name='Delete Post'

@@ -107,7 +107,7 @@ export default function RegisterPage() {
     try {
       await signIn('google', { callbackUrl: '/' });
     } catch (error: unknown) {
-      setError('Terjadi kesalahan saat mendaftar dengan Google');
+      setError(error instanceof Error ? error.message : 'Terjadi kesalahan saat login dengan Google');
     } finally {
       setLoadingGoogle(false);
     }

@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import UserProfile from './components/user-profile';
 import NavMenu from './components/nav-menu';
 import { ModeToggle } from "@/components/mode-toggle";

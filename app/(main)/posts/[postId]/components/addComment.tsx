@@ -5,13 +5,12 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import z, { set } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import Swal from "sweetalert2";
 import { useSession } from "next-auth/react";
@@ -23,18 +22,18 @@ export default function AddComment( { postId }: { postId: number } ) {
     const router = useRouter();
     const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
-    const formSchema = {
+    const formSchema = z.object({
         content: z.string().min(2).max(1000).trim().min(2).max(1000),
-    };
+    });
 
     const form = useForm({
-        resolver: zodResolver(z.object(formSchema)),
+        resolver: zodResolver(formSchema),
         defaultValues: {
             content: "",
         },
     });
 
-    async function commentSubmit(data: any) {
+    async function commentSubmit(data: z.infer<typeof formSchema>) {
         try {
             setLoading(true);
             const formData = new FormData();
@@ -61,8 +60,12 @@ export default function AddComment( { postId }: { postId: number } ) {
                 text: "Your comment has been created successfully.",
             });
             router.refresh();
-        } catch (error) {
-            console.error(error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error('Error adding comment:', error.message);
+            } else {
+                console.error('Unknown error occurred while adding comment');
+            }
         } finally {
             setLoading(false);
         }
