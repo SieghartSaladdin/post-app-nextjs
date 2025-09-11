@@ -61,9 +61,16 @@ export default function PostEdit({
   const submitFunc = async (data: z.infer<typeof formSchema>) => {
     try {
       setSubmitLoading(true);
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("content", data.content);
+      if (data.image) {
+      formData.append("image", data.image);
+      }
+
       const res = await fetch(`/api/posts/${postId}`, {
         method: 'PUT',
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (!res.ok) {
@@ -91,32 +98,41 @@ export default function PostEdit({
   const deleteFunc = async (postId: string) => {
     try {
       setLoading(true);
+
       const res = await fetch(`/api/posts/${postId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error('Failed to delete post');
+        throw new Error(data.error || "Failed to delete post");
       }
 
       Swal.fire({
         toast: true,
-        position: 'top-end',
+        position: "top-end",
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
-        icon: 'success',
-        title: 'Success',
-        text: 'Post Deleted successfully',
-      })
+        icon: "success",
+        title: "Success",
+        text: "Post deleted successfully",
+      });
 
-      router.push('/posts');
+      router.push("/posts");
     } catch (error) {
-      console.error('Error deleting post:', error);
+      console.error("Error deleting post:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to delete post",
+      });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <Form {...form} >

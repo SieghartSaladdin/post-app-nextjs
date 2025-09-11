@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { writeFile } from 'fs/promises';
-import path from 'path';
 import { revalidatePath } from 'next/cache';
 import type { NextRequest } from 'next/server';
+import { supabase } from "@/lib/supabase"; // client Supabase yg kita buat
+
 
 // GET /api/posts
 export async function GET() {
@@ -22,49 +22,64 @@ export async function GET() {
   return NextResponse.json(posts)
 }
 
-export async function POST(req: NextRequest,) {
+export async function POST(req: NextRequest) {
   try {
-    
     const formData = await req.formData();
-    const title = formData.get('title') as string;
-    const content = formData.get('content') as string;
-    const authorId = formData.get('authorId') as string;
-    const image = formData.get('image') as File;
+    const title = formData.get("title") as string;
+    const content = formData.get("content") as string;
+    const authorId = formData.get("authorId") as string;
+    const image = formData.get("image") as File;
 
     if (!image) {
-      return NextResponse.json({ success: false, error: 'Tidak ada file gambar yang diunggah.' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: "Tidak ada file gambar yang diunggah." },
+        { status: 400 }
+      );
     }
-    
-    // Pastikan folder 'public/assets' sudah ada
-    const publicPath = path.join(process.cwd(), 'public', 'assets');
-    const filename = `${Date.now()}-${image.name}`;
-    const filePath = path.join(publicPath, filename);
 
-    // Konversi File ke ArrayBuffer dan Buffer
-    const buffer = Buffer.from(await image.arrayBuffer());
+    // bikin nama file unik
+    const fileName = `${Date.now()}-${image.name}`;
 
-    // Tulis file ke direktori
-    await writeFile(filePath, buffer);
+    // upload ke bucket "imagePosts" di Supabase
+    const { error: uploadError } = await supabase.storage
+      .from("imagePosts")
+      .upload(fileName, image, {
+        cacheControl: "3600",
+        upsert: false,
+      });
 
-    const imageUrl = `/assets/${filename}`;
+    if (uploadError) {
+      return NextResponse.json(
+        { success: false, error: uploadError.message },
+        { status: 500 }
+      );
+    }
 
-    // Lanjutkan dengan Prisma, simpan path file di database
+    // ambil public URL dari file
+    const { data: publicUrl } = supabase.storage
+      .from("imagePosts")
+      .getPublicUrl(fileName);
+
+    // simpan URL ke database lewat Prisma
     const post = await prisma.post.create({
       data: {
         title,
         content,
-        image: imageUrl,
-        authorId
+        image: publicUrl.publicUrl, // simpan link supabase, bukan /assets
+        authorId,
       },
       include: {
-        author: true
-      }
+        author: true,
+      },
     });
 
-    revalidatePath('/posts');
+    revalidatePath("/posts");
     return NextResponse.json({ success: true, post });
   } catch (error) {
-    console.error('Error saat memproses upload:', error);
-    return NextResponse.json({ success: false, error: 'Gagal mengunggah file.' }, { status: 500 });
+    console.error("Error saat memproses upload:", error);
+    return NextResponse.json(
+      { success: false, error: "Gagal mengunggah file." },
+      { status: 500 }
+    );
   }
 }
