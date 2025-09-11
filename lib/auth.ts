@@ -19,22 +19,43 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        console.log('Credential login attempt:', { email: credentials?.email, password: '***' })
+        
+        if (!credentials?.email || !credentials?.password) {
+          console.log('Missing credentials')
+          return null
+        }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
 
-        if (!user || !user.hashedPassword) return null;
+          console.log('User found:', user ? 'Yes' : 'No')
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
+          if (!user || !user.hashedPassword) {
+            console.log('User not found or no password set')
+            return null
+          }
 
-        if (!isPasswordValid) return null;
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.hashedPassword
+          );
 
-        return { id: user.id, email: user.email, name: user.name, image: user.image };
+          console.log('Password valid:', isPasswordValid)
+
+          if (!isPasswordValid) {
+            console.log('Invalid password')
+            return null
+          }
+
+          console.log('Login successful for user:', user.id)
+          return { id: user.id, email: user.email, name: user.name, image: user.image };
+        } catch (error) {
+          console.error('Authorization error:', error)
+          return null
+        }
       },
     }),
   ],
@@ -46,6 +67,7 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
   callbacks: {
     async jwt({ token, user }) {
       if (user) token.id = user.id;
