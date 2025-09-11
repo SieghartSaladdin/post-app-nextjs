@@ -18,10 +18,10 @@ export default function PostCard({ post }: { post: Post }) {
   const router = useRouter();
 
   return (
-    <div className='flex flex-col gap-4 mt-4'>
+    <div className='flex flex-col'>
       
       <div
-        className="border relative flex flex-col border-black dark:border-white w-[300px] rounded-xl overflow-hidden"
+        className="border relative mb-4 flex flex-col border-black dark:border-white w-[300px] rounded-xl overflow-hidden"
       >
         <div
           onClick={() => {

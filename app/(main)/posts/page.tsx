@@ -36,13 +36,18 @@ export default async function Page() {
         {chunkedPosts.map((group, i) => (
           <div
             key={i}
-            className={`border-2 mb-6 rounded-xl p-4 overflow-y-hidden relative ${
+            className={`border-2 mb-6 rounded-xl p-4 md:overflow-y-hidden relative ${
               group.length > 5 ? 'overflow-x-auto' : 'overflow-x-hidden'
+            }
+            ${
+              group.length > 1 ? 'overflow-y-auto' : 'overflow-y-hidden'
             }`}
           >
             <Meteors number={100} />
             Info : {i * group.length + 1}-{(i + 1) * group.length} Post
-            <div className="flex gap-12">
+            <div className={`flex flex-col items-center md:flex-row md:gap-12 md:h-auto ${
+              group.length > 1 ? 'h-[500px]' : 'h-auto'
+            }`}>
                {group.map((post: Post) => (
                 <PostCard key={post.id} post={post} />
               ))}
